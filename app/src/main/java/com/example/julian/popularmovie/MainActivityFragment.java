@@ -1,7 +1,13 @@
 package com.example.julian.popularmovie;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -37,8 +43,13 @@ public class MainActivityFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        if(savedInstanceState == null || !savedInstanceState.containsKey("movieKey")){
+            movieArrayList = new ArrayList<Movie>();
+            updateMovie();
+        } else {
+            movieArrayList = savedInstanceState.getParcelableArrayList("movieKey");
+        }
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
     }
 
     @Override
@@ -82,14 +93,50 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        Log.d("PENIS", "onStart movieTask");
         updateMovie();
     }
 
     private void updateMovie(){
-        FetchMovieTask movieTask = new FetchMovieTask();
-        Log.d("PENIS", "Odpalam movieTask");
-        movieTask.execute();
+
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String sortOrder = prefs.getString(getString(R.string.pref_sort_key), getString(R.string.most_popular));
+
+        Uri uri;
+        String url;
+
+        if(sortOrder == getString(R.string.most_popular)){
+            uri = Uri.parse(getString(R.string.poster_base))
+                    .buildUpon()
+                    .appendQueryParameter("sort_by", "popularity.desc")
+                    .build();
+        } else {
+            uri = Uri.parse(getString(R.string.highest_rated))
+                    .buildUpon()
+                    .appendQueryParameter("sort_by", "vote_count.desc")
+                    .build();
+        }
+
+        url = uri.toString() + "&api_key=" + getString(R.string.api_key);
+
+        if(isNetworkAvailable()){
+            FetchMovieTask movieTask = new FetchMovieTask();
+            movieTask.execute(url);
+        }
+
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+        if (networkInfo != null && networkInfo.isConnected()){
+            return true;
+        }  else {
+            return false;
+        }
+
     }
 
     public class FetchMovieTask extends AsyncTask<String, Void, Movie[]> {
@@ -126,7 +173,7 @@ public class MainActivityFragment extends Fragment {
                 movieDescription = movie.getString(DESCRIPTION);
                 movieReleaseDate = movie.getString(RELEASE_DATE);
                 movieAverageVote = movie.getString(VOTE_AVG);
-                moviePosterPath  = "http://image.tmdb.org/t/p/w185/" + movie.getString(POSTER_PATH);
+                moviePosterPath  = getString(R.string.poster_base) + movie.getString(POSTER_PATH);
 
                 Movie movieObj = new Movie(movieReleaseDate, movieTitle, moviePosterPath, movieDescription, movieAverageVote);
                 movieArray[i] = movieObj;
@@ -151,20 +198,6 @@ public class MainActivityFragment extends Fragment {
 
             String movieUrl = params[0];
 
-//            String apiKey = "c1fa741e11cef0f1559b00acc6e86fff";
-
-//            // This place i need to choose which param will be chosen to request
-//            String popularity = "popularity.desc";
-//            String voteAverage = "vote_average.desc";
-//
-//            final String MOVIE_BASE_URL = "http://api.themoviedb.org/3/discover/movie?";
-//            final String SORT_PARAM = "sort_by";
-//            final String API_KEY_PARAM = "api_key";
-
-//            Uri builtUri = Uri.parse(MOVIE_BASE_URL).buildUpon()
-//                    .appendQueryParameter(SORT_PARAM, popularity)
-//                    .appendQueryParameter(API_KEY_PARAM, apiKey)
-//                    .build();
             try {
                 URL url = new URL(movieUrl);
 

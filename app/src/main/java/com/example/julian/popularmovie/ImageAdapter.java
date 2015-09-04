@@ -20,9 +20,6 @@ public class ImageAdapter extends BaseAdapter {
     private ArrayList<Movie> posters;
     LayoutInflater inflater;
 
-//    public static final String BASE_URL = "http://image.tmdb.org/t/p/";
-//    public static final String IMAGE_SIZE = "w185";
-
     public ImageAdapter(Context context, ArrayList<Movie> posters) {
         this.context = context;
         this.posters = posters;
