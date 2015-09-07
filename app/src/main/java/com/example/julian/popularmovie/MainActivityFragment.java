@@ -1,6 +1,7 @@
 package com.example.julian.popularmovie;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -18,7 +19,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -91,7 +91,13 @@ public class MainActivityFragment extends Fragment {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getActivity(), "Nacisniety", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(getActivity(), DetailActivityFragment.class);
+                intent.putExtra("original_title", movieArrayList.get(position).title);
+                intent.putExtra("overview", movieArrayList.get(position).description);
+                intent.putExtra("poster_path", movieArrayList.get(position).poster);
+                intent.putExtra("release_date", movieArrayList.get(position).releaseDate);
+                intent.putExtra("vote_average", movieArrayList.get(position).voteAverage);
+                startActivity(intent);
             }
         });
         setHasOptionsMenu(true);
