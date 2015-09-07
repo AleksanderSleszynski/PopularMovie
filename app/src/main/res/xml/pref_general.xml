@@ -6,6 +6,6 @@
         android:title="@string/pref_sort_label"
         android:defaultValue="@string/most_popular"
         android:entries="@array/movie_sort_options"
-        android:entryValues="@array/pref_example_list_values" />
+        android:entryValues="@array/movie_sort_options" />
 
 </PreferenceScreen>

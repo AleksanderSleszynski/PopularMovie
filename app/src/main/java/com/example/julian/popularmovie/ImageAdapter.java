@@ -59,8 +59,10 @@ public class ImageAdapter extends BaseAdapter {
             imageView = (ImageView) convertView;
         }
 
-        Picasso.with(context).load(posters.get(position).getPosterUrl()).error(R.drawable.sample_0).into(imageView);
-
+        Picasso.with(context)
+                .load(posters.get(position).getPosterUrl())
+                .error(R.drawable.sample_0)
+                .into(imageView);
         return imageView;
     }
 

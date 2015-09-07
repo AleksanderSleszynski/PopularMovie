@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -53,6 +54,14 @@ public class MainActivityFragment extends Fragment {
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        if(movieArrayList != null){
+            outState.putParcelableArrayList("movieKey", movieArrayList);
+        }
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.movie_fragment, menu);
     }
@@ -82,7 +91,7 @@ public class MainActivityFragment extends Fragment {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+                Toast.makeText(getActivity(), "Nacisniety", Toast.LENGTH_LONG).show();
             }
         });
         setHasOptionsMenu(true);
@@ -91,10 +100,26 @@ public class MainActivityFragment extends Fragment {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        updateMovie();
+    public void onResume() {
+        SharedPreferences prefs =PreferenceManager.getDefaultSharedPreferences(getActivity());
+        prefs.registerOnSharedPreferenceChangeListener(listener);
+        super.onResume();
     }
+
+    @Override
+    public void onDestroy() {
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        pref.unregisterOnSharedPreferenceChangeListener(listener);
+        super.onDestroy();
+    }
+
+    SharedPreferences.OnSharedPreferenceChangeListener listener =
+            new SharedPreferences.OnSharedPreferenceChangeListener() {
+                @Override
+                public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                    updateMovie();
+                }
+            };
 
     private void updateMovie(){
 
@@ -106,12 +131,12 @@ public class MainActivityFragment extends Fragment {
         String url;
 
         if(sortOrder == getString(R.string.most_popular)){
-            uri = Uri.parse(getString(R.string.poster_base))
+            uri = Uri.parse(getString(R.string.movie_Base_Url))
                     .buildUpon()
                     .appendQueryParameter("sort_by", "popularity.desc")
                     .build();
         } else {
-            uri = Uri.parse(getString(R.string.highest_rated))
+            uri = Uri.parse(getString(R.string.movie_Base_Url))
                     .buildUpon()
                     .appendQueryParameter("sort_by", "vote_count.desc")
                     .build();
@@ -131,12 +156,7 @@ public class MainActivityFragment extends Fragment {
                 (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
-        if (networkInfo != null && networkInfo.isConnected()){
-            return true;
-        }  else {
-            return false;
-        }
-
+        return networkInfo != null && networkInfo.isConnected();
     }
 
     public class FetchMovieTask extends AsyncTask<String, Void, Movie[]> {
@@ -184,10 +204,6 @@ public class MainActivityFragment extends Fragment {
 
         @Override
         protected Movie[] doInBackground(String... params) {
-
-            if (params.length == 0) {
-                return null;
-            }
 
             //Declare this outside the try/catch
             HttpURLConnection urlConnection = null;
