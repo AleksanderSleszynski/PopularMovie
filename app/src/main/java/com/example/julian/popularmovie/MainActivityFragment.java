@@ -91,7 +91,7 @@ public class MainActivityFragment extends Fragment {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getActivity(), DetailActivityFragment.class);
+                Intent intent = new Intent(getActivity(), DetailActivity.class);
                 intent.putExtra("original_title", movieArrayList.get(position).title);
                 intent.putExtra("overview", movieArrayList.get(position).description);
                 intent.putExtra("poster_path", movieArrayList.get(position).poster);
