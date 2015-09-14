@@ -4,7 +4,7 @@
     <string name="title_activity_detail">DetailActivity</string>
     <string name="poster_base">http://image.tmdb.org/t/p/w185/</string>
     <string name="movie_Base_Url" translatable="false">http://api.themoviedb.org/3/discover/movie?</string>
-    <string name="api_key">Here you need to enter Api Key</string>
+    <string name="api_key">c1fa741e11cef0f1559b00acc6e86fff</string>
     <string name="pref_sort_label">Sort by</string>
     <string name="pref_sort_key">sort</string>
     <string name="most_popular">Most Popular</string>
