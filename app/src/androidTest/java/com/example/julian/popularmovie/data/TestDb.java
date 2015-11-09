@@ -1,6 +1,7 @@
 package com.example.julian.popularmovie.data;
 
 
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
@@ -28,7 +29,7 @@ public class TestDb extends AndroidTestCase {
         // build a HashSet of all of the table names we wish to look for
 
         final HashSet<String> tableNameHashSet = new HashSet<String>();
-        tableNameHashSet.add(MovieContract.MovieEntry.TABEL_NAME);
+        tableNameHashSet.add(MovieContract.MovieEntry.TABLE_NAME);
 
         mContext.deleteDatabase(MovieDbHelper.DATABASE_NAME);
         SQLiteDatabase db = new MovieDbHelper(this.mContext).getWritableDatabase();
@@ -49,7 +50,7 @@ public class TestDb extends AndroidTestCase {
                 tableNameHashSet.isEmpty());
 
         // now, do our tables contain the correct columns?
-        c = db.rawQuery("PRAGMA table_info(" + MovieContract.MovieEntry.TABEL_NAME + ")",
+        c = db.rawQuery("PRAGMA table_info(" + MovieContract.MovieEntry.TABLE_NAME + ")",
                 null);
 
         assertTrue("Error: This means that we were unable to query the database for table information.",
@@ -78,4 +79,45 @@ public class TestDb extends AndroidTestCase {
         db.close();
 
     }
+
+    public long testMovieTable(){
+        //Get reference to writable database
+        MovieDbHelper dbHelper = new MovieDbHelper(mContext);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        // Create ContentValues of what i want to insert
+        ContentValues testValues = TestUtilities.createMovieValues();
+
+        // Insert ContentValues into database and get a row ID back
+        long locationRowId;
+        locationRowId = db.insert(MovieContract.MovieEntry.TABLE_NAME, null , testValues);
+
+        //Verify we got a row back
+        assertTrue(locationRowId != -1);
+
+        //Query the database and receive a Cursor back
+        Cursor cursor = db.query(
+                MovieContract.MovieEntry.TABLE_NAME, // Table to query
+                null, // all columns
+                null, // Columns for the "where" clause
+                null, // Values fot the "where" clause
+                null, // columns to group by
+                null, // columns to filter by row groups
+                null  // sort order
+        );
+        // Move the cursor to a valid database row
+        assertTrue("Error: No Records returned from location query", cursor.moveToFirst());
+
+        // Validate data in resulting Cursor with the original ContentValues
+        TestUtilities.validateCurrentRecord("Error: Movie Query Validation Failed",
+                cursor, testValues);
+
+        assertFalse("Error: More than one record returned for movie query",
+                cursor.moveToNext());
+        cursor.close();
+        db.close();
+
+        return locationRowId;
+    }
+
 }
