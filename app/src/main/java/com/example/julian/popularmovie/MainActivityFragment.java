@@ -1,5 +1,6 @@
 package com.example.julian.popularmovie;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -31,6 +32,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Vector;
 
 
 public class MainActivityFragment extends Fragment {
@@ -165,6 +167,7 @@ public class MainActivityFragment extends Fragment {
         return networkInfo != null && networkInfo.isConnected();
     }
 
+    // TODO: Delete this block of code
     public class FetchMovieTask extends AsyncTask<String, Void, Movie[]> {
 
         private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
@@ -184,6 +187,7 @@ public class MainActivityFragment extends Fragment {
             JSONArray movieInfoArray = movieJsonObject.getJSONArray(RESULTS);
 
             movieArray = new Movie[movieInfoArray.length()];
+            Vector<ContentValues> cVVector = new Vector<ContentValues>(movieInfoArray.length());
 
             String movieTitle;
             String movieDescription;
@@ -203,6 +207,7 @@ public class MainActivityFragment extends Fragment {
 
                 Movie movieObj = new Movie(movieReleaseDate, movieTitle, moviePosterPath, movieDescription, movieAverageVote);
                 movieArray[i] = movieObj;
+
             }
 
             return movieArray;
