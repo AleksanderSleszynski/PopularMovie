@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Vector;
 
 public class FetchMovieTask extends AsyncTask<String, Void, Movie[]> {
 
@@ -47,6 +48,8 @@ public class FetchMovieTask extends AsyncTask<String, Void, Movie[]> {
         JSONArray movieInfoArray = movieJsonObject.getJSONArray(RESULTS);
 
         movieArray = new Movie[movieInfoArray.length()];
+        Vector<ContentValues> cVVector = new Vector<ContentValues>(movieInfoArray.length());
+
 
         String movieTitle;
         String movieDescription;
@@ -65,8 +68,6 @@ public class FetchMovieTask extends AsyncTask<String, Void, Movie[]> {
             moviePosterPath = mContext.getString(R.string.poster_base) + movie.getString(POSTER_PATH);
             // TODO: Here we should add trailers etc...
 
-
-
             Movie movieObj = new Movie(movieReleaseDate, movieTitle, moviePosterPath, movieDescription, movieAverageVote);
             movieArray[i] = movieObj;
 
@@ -76,6 +77,16 @@ public class FetchMovieTask extends AsyncTask<String, Void, Movie[]> {
             movieValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, movieReleaseDate);
             movieValues.put(MovieContract.MovieEntry.COLUMN_AVERAGE_VOTE, movieAverageVote);
             movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, moviePosterPath);
+
+            cVVector.add(movieValues);
+        }
+
+        int inserted = 0;
+        if( cVVector.size() > 0){
+            // TODO:
+            ContentValues[] cvArray = new ContentValues[cVVector.size()];
+            cVVector.toArray();
+            inserted = mContext.getContentResolver().bulkInsert(MovieContract.MovieEntry.CONTENT_URI, cvArray);
         }
 
         return movieArray;

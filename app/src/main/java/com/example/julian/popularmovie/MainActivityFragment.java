@@ -1,6 +1,5 @@
 package com.example.julian.popularmovie;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -32,7 +31,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Vector;
 
 
 public class MainActivityFragment extends Fragment {
@@ -187,7 +185,6 @@ public class MainActivityFragment extends Fragment {
             JSONArray movieInfoArray = movieJsonObject.getJSONArray(RESULTS);
 
             movieArray = new Movie[movieInfoArray.length()];
-            Vector<ContentValues> cVVector = new Vector<ContentValues>(movieInfoArray.length());
 
             String movieTitle;
             String movieDescription;
