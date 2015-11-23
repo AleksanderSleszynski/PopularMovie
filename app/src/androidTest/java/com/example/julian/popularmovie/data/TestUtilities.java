@@ -18,6 +18,8 @@ import java.util.Set;
 
 public class TestUtilities extends AndroidTestCase {
 
+    static final long TEST_MOVIE = 102899;
+
     static void validateCursor(String error, Cursor valueCursor, ContentValues expectedValues) {
         assertTrue("Empty cursor returned. " + error, valueCursor.moveToFirst());
         validateCurrentRecord(error, valueCursor, expectedValues);
