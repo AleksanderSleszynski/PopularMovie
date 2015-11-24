@@ -52,7 +52,6 @@ public class TestUtilities extends AndroidTestCase {
         movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, "/jjBgi2r5cRt36xF6iNUEhzscEcb.jpg");
         movieValues.put(MovieContract.MovieEntry.COLUMN_FAVOURITE, true);
 
-
         return movieValues;
     }
 
@@ -67,7 +66,6 @@ public class TestUtilities extends AndroidTestCase {
         assertTrue("Error: Failure to insert Movie Values", locationRowId != -1);
 
         return locationRowId;
-
     }
 
     static class TestContentObserver extends ContentObserver {

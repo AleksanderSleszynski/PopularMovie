@@ -4,25 +4,19 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
-import android.text.format.Time;
 
-
-/**
- * Created by julain on 07.11.15.
- */
 public class MovieContract {
 
     public static final String CONTENT_AUTHORITY = "com.example.julian.popularmovie";
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
     public static final String PATH_MOVIE = "movie";
 
-
-    public static long normalizeDate(long startDate) {
-        Time time = new Time();
-        time.set(startDate);
-        int julianDay = Time.getJulianDay(startDate, time.gmtoff);
-        return time.setJulianDay(julianDay);
-    }
+//    public static long normalizeDate(long startDate) {
+//        Time time = new Time();
+//        time.set(startDate);
+//        int julianDay = Time.getJulianDay(startDate, time.gmtoff);
+//        return time.setJulianDay(julianDay);
+//    }
 
     public static final class MovieEntry implements BaseColumns{
 

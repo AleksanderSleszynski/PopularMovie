@@ -235,6 +235,71 @@ public class TestProvider extends AndroidTestCase {
         mContext.getContentResolver()
                 .unregisterContentObserver(movieObserver);
     }
-//    ToDo: createBulkInsertMovieValues
-//    ToDo: testBulkInsert
+
+    static private final int BULK_INSERT_RECORDS_TO_INSERT = 7;
+    static ContentValues[] createBulkInsertMovieValues(long movieRowId){
+        ContentValues[] returnContetnValues = new ContentValues[BULK_INSERT_RECORDS_TO_INSERT];
+
+        for(int i = 0; i < BULK_INSERT_RECORDS_TO_INSERT; i++){
+           ContentValues movieValues = new ContentValues();
+            movieValues.put(MovieContract.MovieEntry._ID, movieRowId);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_TITLE, "Jurassic World");
+            movieValues.put(MovieContract.MovieEntry.COLUMN_DESCRIPTION, "Twenty-two years after the events of Jurassic Park");
+            movieValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, "2015-06-12");
+            movieValues.put(MovieContract.MovieEntry.COLUMN_AVERAGE_VOTE, 6.9);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, "/jjBgi2r5cRt36xF6iNUEhzscEcb.jpg");
+            movieValues.put(MovieContract.MovieEntry.COLUMN_FAVOURITE, true);
+            returnContetnValues[i] = movieValues;
+        }
+        return returnContetnValues;
+    }
+
+
+    public void testBulkInsert() {
+        ContentValues testValues = TestUtilities.createMovieValues();
+        Uri movieUri = mContext.getContentResolver().insert(MovieContract.MovieEntry.CONTENT_URI, testValues);
+        long movieRowId = ContentUris.parseId(movieUri);
+
+        assertTrue(movieRowId != -1);
+
+        Cursor cursor = mContext.getContentResolver().query(
+                MovieContract.MovieEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+
+        TestUtilities.validateCursor("testBulkInsert: Error validating MovieEntry",
+                cursor, testValues);
+
+        ContentValues[] bulkInsertContentValues = createBulkInsertMovieValues(movieRowId);
+
+        TestUtilities.TestContentObserver movieObserver = TestUtilities.getTestContentObserver();
+        mContext.getContentResolver().registerContentObserver(MovieContract.MovieEntry.CONTENT_URI, true, movieObserver);
+
+        int insertCount = mContext.getContentResolver().bulkInsert(MovieContract.MovieEntry.CONTENT_URI, bulkInsertContentValues);
+
+        movieObserver.waitForNotificationOrFail();
+        mContext.getContentResolver().unregisterContentObserver(movieObserver);
+
+        assertEquals(insertCount, BULK_INSERT_RECORDS_TO_INSERT);
+
+        cursor = mContext.getContentResolver().query(
+                MovieContract.MovieEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+
+        assertEquals(cursor.getCount(), BULK_INSERT_RECORDS_TO_INSERT);
+
+        cursor.moveToFirst();
+        for(int i = 0; i<BULK_INSERT_RECORDS_TO_INSERT; i++, cursor.moveToNext()){
+            TestUtilities.validateCurrentRecord("testBulkInsert. Error validating MovieEntry " + i,
+                    cursor, bulkInsertContentValues[i]);
+        }
+        cursor.close();
+    }
 }

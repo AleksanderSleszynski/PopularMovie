@@ -1,7 +1,10 @@
 package com.example.julian.popularmovie.data;
 
-/**
- * Created by julain on 14.11.15.
- */
-public class TestMovieContract {
+import android.test.AndroidTestCase;
+
+public class TestMovieContract extends AndroidTestCase {
+
+    public void testBuildMovie(){
+//        Uri movieUri = MovieContract.MovieEntry.buildMovieUri();
+    }
 }
