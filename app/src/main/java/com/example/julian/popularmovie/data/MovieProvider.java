@@ -14,7 +14,21 @@ public class MovieProvider extends ContentProvider {
     public static final UriMatcher sUriMatcher = buildUriMatcher();
     private MovieDbHelper mOpenHelper;
 
-    static final int MOVIE = 100;
+    private static final int MOVIES = 100;
+    private static final int MOVIE = 101;
+    private static final int MOVIE_VIDEOS = 102;
+    private static final int MOVIE_REVIEWS = 103;
+    private static final int VIDEOS = 200;
+    private static final int REVIEWS = 300;
+
+    public static final String MOVIE_BY_ID_SELECTION = MovieContract.MovieEntry.TABLE_NAME
+            + "." + MovieContract.MovieEntry._ID + " = ? ";
+
+    public static final String VIDEOS_BY_MOVIE_SELECTION = MovieContract.VideoEntry.TABLE_NAME
+            + "." + MovieContract.VideoEntry.COLUMNT_MOVIE_ID + " = ? ";
+
+    public static final String REVIEWS_BY_MOVIE_SELECTION = MovieContract.ReviewEntry.TABLE_NAME
+            + "." + MovieContract.ReviewEntry.COLUMN_MOVIE_ID + " = ? ";
 
     private static final SQLiteQueryBuilder sMovieSettingQueryBuilder;
 
@@ -32,7 +46,12 @@ public class MovieProvider extends ContentProvider {
         final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = MovieContract.CONTENT_AUTHORITY;
 
-        uriMatcher.addURI(authority, MovieContract.PATH_MOVIE, MOVIE);
+        uriMatcher.addURI(authority, MovieContract.PATH_MOVIE, MOVIES);
+        uriMatcher.addURI(authority, MovieContract.PATH_MOVIE + "/#", MOVIE);
+        uriMatcher.addURI(authority, MovieContract.PATH_MOVIE + "/#/" + MovieContract.PATH_VIDEOS, MOVIE_VIDEOS);
+        uriMatcher.addURI(authority, MovieContract.PATH_MOVIE + "/#/" + MovieContract.PATH_REVIEWS, MOVIE_REVIEWS);
+        uriMatcher.addURI(authority, MovieContract.PATH_VIDEOS, VIDEOS);
+        uriMatcher.addURI(authority, MovieContract.PATH_REVIEWS, REVIEWS);
 
         return uriMatcher;
     }
@@ -46,15 +65,59 @@ public class MovieProvider extends ContentProvider {
     @Nullable
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        return mOpenHelper.getReadableDatabase().query(
-                MovieContract.MovieEntry.TABLE_NAME,
-                projection,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                sortOrder
-        );
+        Cursor retCursor;
+        switch (sUriMatcher.match(uri)){
+            case MOVIES:
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        MovieContract.MovieEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            case MOVIE:
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        MovieContract.MovieEntry.TABLE_NAME,
+                        projection,
+                        MOVIE_BY_ID_SELECTION,
+                        new String[]{Long.toString(MovieContract.parseId(uri))},
+                        null,
+                        null,
+                        null
+                );
+                break;
+            case MOVIE_VIDEOS:
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        MovieContract.VideoEntry.TABLE_NAME,
+                        projection,
+                        VIDEOS_BY_MOVIE_SELECTION,
+                        new String[]{Long.toString(MovieContract.parseId(uri))},
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            case MOVIE_REVIEWS:
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        MovieContract.ReviewEntry.TABLE_NAME,
+                        projection,
+                        REVIEWS_BY_MOVIE_SELECTION,
+                        new String[]{Long.toString(MovieContract.parseId(uri))},
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown URI: " + uri);
+        }
+
+        retCursor.setNotificationUri(getContext().getContentResolver(), uri);
+
+        return retCursor;
     }
 
     @Nullable
@@ -64,8 +127,18 @@ public class MovieProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
 
         switch (match) {
-            case MOVIE:
+            case MOVIES:
                 return MovieContract.MovieEntry.CONTENT_TYPE;
+            case MOVIE:
+                return MovieContract.MovieEntry.CONTENT_ITEM_TYPE;
+            case MOVIE_VIDEOS:
+                return MovieContract.VideoEntry.CONTENT_TYPE;
+            case VIDEOS:
+                return MovieContract.VideoEntry.CONTENT_TYPE;
+            case MOVIE_REVIEWS:
+                return MovieContract.ReviewEntry.CONTENT_TYPE;
+            case REVIEWS:
+                return MovieContract.ReviewEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -79,7 +152,7 @@ public class MovieProvider extends ContentProvider {
         Uri returnUri;
 
         switch (match) {
-            case MOVIE: {
+            case MOVIES: {
                 long _id = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, values);
                 if (_id > 0)
                     returnUri = MovieContract.MovieEntry.buildMovieUri(_id);
@@ -103,7 +176,7 @@ public class MovieProvider extends ContentProvider {
         if (null == selection) selection = "1";
 
         switch (match) {
-            case MOVIE: {
+            case MOVIES: {
                 rowsDeleted = db.delete(MovieContract.MovieEntry.TABLE_NAME,
                         selection,
                         selectionArgs);
@@ -126,7 +199,7 @@ public class MovieProvider extends ContentProvider {
         int rowsUpdated;
 
         switch(match){
-            case MOVIE:{
+            case MOVIES:{
                 rowsUpdated = db.update(
                         MovieContract.MovieEntry.TABLE_NAME,
                         values,
@@ -149,7 +222,7 @@ public class MovieProvider extends ContentProvider {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         switch (match){
-            case MOVIE:
+            case MOVIES:
                 db.beginTransaction();
                 int returnCount = 0 ;
                 try {
