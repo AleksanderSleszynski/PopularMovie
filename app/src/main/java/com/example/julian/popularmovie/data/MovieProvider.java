@@ -5,7 +5,6 @@ import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 
@@ -30,12 +29,12 @@ public class MovieProvider extends ContentProvider {
     public static final String REVIEWS_BY_MOVIE_SELECTION = MovieContract.ReviewEntry.TABLE_NAME
             + "." + MovieContract.ReviewEntry.COLUMN_MOVIE_ID + " = ? ";
 
-    private static final SQLiteQueryBuilder sMovieSettingQueryBuilder;
-
-    static {
-        sMovieSettingQueryBuilder = new SQLiteQueryBuilder();
-        sMovieSettingQueryBuilder.setTables(MovieContract.MovieEntry.TABLE_NAME);
-    }
+//    private static final SQLiteQueryBuilder sMovieSettingQueryBuilder;
+//
+//    static {
+//        sMovieSettingQueryBuilder = new SQLiteQueryBuilder();
+//        sMovieSettingQueryBuilder.setTables(MovieContract.MovieEntry.TABLE_NAME);
+//    }
 
     private Cursor getMovie(Uri uri, String[] projection, String sortOrder) {
         return null;
@@ -66,7 +65,7 @@ public class MovieProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         Cursor retCursor;
-        switch (sUriMatcher.match(uri)){
+        switch (sUriMatcher.match(uri)) {
             case MOVIES:
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         MovieContract.MovieEntry.TABLE_NAME,
@@ -176,12 +175,43 @@ public class MovieProvider extends ContentProvider {
         if (null == selection) selection = "1";
 
         switch (match) {
-            case MOVIES: {
+            case MOVIES:
                 rowsDeleted = db.delete(MovieContract.MovieEntry.TABLE_NAME,
                         selection,
                         selectionArgs);
                 break;
-            }
+
+            case MOVIE:
+                rowsDeleted = db.delete(MovieContract.MovieEntry.TABLE_NAME,
+                        MOVIE_BY_ID_SELECTION,
+                        new String[]{Long.toString(MovieContract.parseId(uri))});
+                break;
+
+            case MOVIE_VIDEOS:
+                rowsDeleted = db.delete(
+                        MovieContract.VideoEntry.TABLE_NAME,
+                        VIDEOS_BY_MOVIE_SELECTION,
+                        new String[]{Long.toString(MovieContract.parseId(uri))});
+                break;
+
+            case MOVIE_REVIEWS:
+                rowsDeleted = db.delete(
+                        MovieContract.ReviewEntry.TABLE_NAME,
+                        REVIEWS_BY_MOVIE_SELECTION,
+                        new String[]{Long.toString(MovieContract.parseId(uri))});
+                break;
+            case VIDEOS:
+                rowsDeleted = db.delete(MovieContract.VideoEntry.TABLE_NAME,
+                        selection,
+                        selectionArgs);
+                break;
+
+            case REVIEWS:
+                rowsDeleted = db.delete(MovieContract.ReviewEntry.TABLE_NAME,
+                        selection,
+                        selectionArgs);
+                break;
+
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -194,12 +224,12 @@ public class MovieProvider extends ContentProvider {
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        final SQLiteDatabase db =mOpenHelper.getWritableDatabase();
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         int rowsUpdated;
 
-        switch(match){
-            case MOVIES:{
+        switch (match) {
+            case MOVIES: {
                 rowsUpdated = db.update(
                         MovieContract.MovieEntry.TABLE_NAME,
                         values,
@@ -210,7 +240,7 @@ public class MovieProvider extends ContentProvider {
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-        if(rowsUpdated != 0 ){
+        if (rowsUpdated != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
 
@@ -219,27 +249,41 @@ public class MovieProvider extends ContentProvider {
 
     @Override
     public int bulkInsert(Uri uri, ContentValues[] values) {
-        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-        final int match = sUriMatcher.match(uri);
-        switch (match){
+        String tableName;
+        switch (sUriMatcher.match(uri)) {
             case MOVIES:
-                db.beginTransaction();
-                int returnCount = 0 ;
-                try {
-                    for (ContentValues value : values){
-                        long _id = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, value);
-                        if(_id != -1){
-                            returnCount++;
-                        }
-                    }
-                    db.setTransactionSuccessful();
-                } finally {
-                    db.endTransaction();
-                }
-                getContext().getContentResolver().notifyChange(uri, null);
-                return returnCount;
+                tableName = MovieContract.MovieEntry.TABLE_NAME;
+                break;
+
+            case VIDEOS:
+                tableName = MovieContract.MovieEntry.TABLE_NAME;
+                break;
+
+            case REVIEWS:
+                tableName = MovieContract.ReviewEntry.TABLE_NAME;
+                break;
             default:
                 return super.bulkInsert(uri, values);
+
         }
+
+        int returnCount = 0;
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            for (ContentValues value : values) {
+                long _id = db.insert(tableName, null, value);
+                if (_id != -1) {
+                    returnCount++;
+                }
+            }
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+        getContext().getContentResolver().notifyChange(uri, null);
+        return returnCount;
+
+
     }
 }

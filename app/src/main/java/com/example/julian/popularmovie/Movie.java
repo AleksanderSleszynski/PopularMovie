@@ -3,9 +3,6 @@ package com.example.julian.popularmovie;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-/**
- * Created by Julian on 8/21/2015.
- */
 public class Movie implements Parcelable {
 
     String releaseDate;
