@@ -3,29 +3,35 @@ package com.example.julian.popularmovie;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.Date;
+
 public class Movie implements Parcelable {
 
-    String releaseDate;
-    String title;
-    String poster;
-    String description;
-    String voteAverage;
+    private long id;
+    private String title;
+    private String description;
+    private Date releaseDate;
+    private String poster;
+    private float voteAverage;
+//    private float rating;
 
-
-    public Movie(String releaseDate, String title, String poster, String description, String voteAverage) {
-        this.description = description;
-        this.poster      = poster;
-        this.releaseDate = releaseDate;
+    public Movie(long id, String title, String description, Date releaseDate, String poster, float voteAverage) {
+        this.id          = id;
         this.title       = title;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.poster      = poster;
         this.voteAverage = voteAverage;
     }
 
     protected Movie(Parcel in) {
-        releaseDate = in.readString();
+        id          = in.readLong();
         title       = in.readString();
-        poster      = in.readString();
         description = in.readString();
-        voteAverage = in.readString();
+        long time   = in.readLong();
+        releaseDate = time != 0 ? new Date(time) : null;
+        poster      = in.readString();
+        voteAverage = in.readFloat();
     }
 
     public static final Creator<Movie> CREATOR = new Creator<Movie>() {
@@ -48,11 +54,12 @@ public class Movie implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(releaseDate);
+        dest.writeLong(id);
         dest.writeString(title);
-        dest.writeString(poster);
         dest.writeString(description);
-        dest.writeString(voteAverage);
+        dest.writeLong(releaseDate != null ? releaseDate.getTime() : 0);
+        dest.writeString(poster);
+        dest.writeFloat(voteAverage);
     }
 
     public String getPosterUrl(){
