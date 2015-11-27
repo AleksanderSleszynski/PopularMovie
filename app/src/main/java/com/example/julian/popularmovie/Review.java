@@ -14,6 +14,10 @@ public class Review implements Parcelable{
         this.content = content;
     }
 
+    public Review() {
+
+    }
+
     public boolean isValid() {
         return !TextUtils.isEmpty(author) && !TextUtils.isEmpty(content);
     }
@@ -44,5 +48,21 @@ public class Review implements Parcelable{
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(author);
         dest.writeString(content);
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 }

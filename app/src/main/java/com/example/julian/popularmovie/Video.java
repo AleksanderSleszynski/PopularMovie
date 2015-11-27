@@ -11,6 +11,8 @@ public class Video implements Parcelable{
     private String site;
     private String key;
 
+    public Video() {}
+
     public boolean isValid(){
         return SITE_YOUTUBE.equals(site) && key != null && key.length() > 0;
     }
@@ -47,4 +49,21 @@ public class Video implements Parcelable{
         dest.writeString(site);
         dest.writeString(key);
     }
+
+    public String getSite() {
+        return site;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setSite(String site) {
+        this.site = site;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
 }

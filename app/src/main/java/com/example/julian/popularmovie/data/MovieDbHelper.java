@@ -1,13 +1,20 @@
 package com.example.julian.popularmovie.data;
 
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.example.julian.popularmovie.Movie;
+import com.example.julian.popularmovie.Review;
+import com.example.julian.popularmovie.Video;
 import com.example.julian.popularmovie.data.MovieContract.MovieEntry;
-import com.example.julian.popularmovie.data.MovieContract.VideoEntry;
 import com.example.julian.popularmovie.data.MovieContract.ReviewEntry;
+import com.example.julian.popularmovie.data.MovieContract.VideoEntry;
+
+import java.util.Date;
 
 
 public class MovieDbHelper extends SQLiteOpenHelper {
@@ -62,5 +69,71 @@ public class MovieDbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXIST " + VideoEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXIST " + ReviewEntry.TABLE_NAME);
         onCreate(db);
+    }
+
+    public static ContentValues toContentValues(Movie movie){
+        ContentValues values = new ContentValues();
+
+        values.put(MovieEntry._ID, movie.getId());
+        values.put(MovieEntry.COLUMN_TITLE, movie.getTitle());
+        values.put(MovieEntry.COLUMN_DESCRIPTION, movie.getDescription());
+        values.put(MovieEntry.COLUMN_RELEASE_DATE,
+                movie.getReleaseDate() != null ? movie.getReleaseDate().getTime() : null);
+        values.put(MovieEntry.COLUMN_POSTER_PATH, movie.getPoster());
+        values.put(MovieEntry.COLUMN_AVERAGE_VOTE, movie.getVoteAverage());
+
+        return values;
+    }
+
+    public static ContentValues toContentValues(Video video, long movieId){
+        ContentValues values = new ContentValues();
+
+        values.put(VideoEntry.COLUMNT_MOVIE_ID, movieId);
+        values.put(VideoEntry.COLUMN_KEY, video.getKey());
+
+        return values;
+    }
+
+    public static ContentValues toContentValues(Review review, long movieId){
+        ContentValues values = new ContentValues();
+
+        values.put(ReviewEntry.COLUMN_MOVIE_ID, movieId);
+        values.put(ReviewEntry.COLUMN_AUTHOR, review.getAuthor());
+        values.put(ReviewEntry.COLMUN_CONTENT, review.getContent());
+
+        return values;
+    }
+
+    public static Movie toMovie(Cursor cursor){
+        Movie movie = new Movie();
+
+        movie.setId(cursor.getLong(cursor.getColumnIndex(MovieEntry._ID)));
+        movie.setTitle(cursor.getString(cursor.getColumnIndex(MovieEntry.COLUMN_TITLE)));
+        movie.setDescription(cursor.getString(cursor.getColumnIndex(MovieEntry.COLUMN_DESCRIPTION)));
+        if(!cursor.isNull(cursor.getColumnIndex(MovieEntry.COLUMN_RELEASE_DATE))){
+            movie.setReleaseDate(new Date(cursor.getLong(
+                    cursor.getColumnIndex(MovieEntry.COLUMN_RELEASE_DATE))));
+        }
+        movie.setVoteAverage(cursor.getFloat(cursor.getColumnIndex(MovieEntry.COLUMN_POSTER_PATH)));
+
+        return movie;
+    }
+
+    public static Video toVideo(Cursor cursor){
+        Video video = new Video();
+
+        video.setSite(Video.SITE_YOUTUBE);
+        video.setKey(cursor.getString(cursor.getColumnIndex(VideoEntry.COLUMN_KEY)));
+
+        return video;
+    }
+
+    public static Review toReview(Cursor cursor){
+        Review review = new Review();
+
+        review.setAuthor(cursor.getString(cursor.getColumnIndex(ReviewEntry.COLUMN_AUTHOR)));
+        review.setContent(cursor.getString(cursor.getColumnIndex(ReviewEntry.COLMUN_CONTENT)));
+
+        return review;
     }
 }

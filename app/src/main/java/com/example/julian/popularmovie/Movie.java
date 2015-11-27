@@ -15,14 +15,16 @@ public class Movie implements Parcelable {
     private float voteAverage;
 //    private float rating;
 
-    public Movie(long id, String title, String description, Date releaseDate, String poster, float voteAverage) {
-        this.id          = id;
-        this.title       = title;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.poster      = poster;
-        this.voteAverage = voteAverage;
-    }
+//    public Movie(long id, String title, String description, Date releaseDate, String poster, float voteAverage) {
+//        this.id          = id;
+//        this.title       = title;
+//        this.description = description;
+//        this.releaseDate = releaseDate;
+//        this.poster      = poster;
+//        this.voteAverage = voteAverage;
+//    }
+
+    public Movie(){}
 
     protected Movie(Parcel in) {
         id          = in.readLong();
@@ -65,4 +67,53 @@ public class Movie implements Parcelable {
     public String getPosterUrl(){
         return this.poster;
     }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setReleaseDate(Date releaseDate) {
+        this.releaseDate = releaseDate;
+    }
+
+    public void setPoster(String poster) {
+        this.poster = poster;
+    }
+
+    public void setVoteAverage(float voteAverage) {
+        this.voteAverage = voteAverage;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Date getReleaseDate() {
+        return releaseDate;
+    }
+
+    public String getPoster() {
+        return poster;
+    }
+
+    public float getVoteAverage() {
+        return voteAverage;
+    }
+
 }
