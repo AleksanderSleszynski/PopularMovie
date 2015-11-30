@@ -68,7 +68,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, Movie[]> {
             moviePosterPath = mContext.getString(R.string.poster_base) + movie.getString(POSTER_PATH);
             // TODO: Here we should add trailers etc...
 
-            Movie movieObj = new Movie(movieReleaseDate, movieTitle, moviePosterPath, movieDescription, movieAverageVote);
+            Movie movieObj = new Movie();//movieReleaseDate, movieTitle, moviePosterPath, movieDescription, movieAverageVote);
             movieArray[i] = movieObj;
 
             ContentValues movieValues  =new ContentValues();

@@ -1,8 +1,11 @@
 package com.example.julian.popularmovie;
 
+import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.Loader;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -10,6 +13,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.ContentLoadingProgressBar;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,7 +23,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.GridView;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,31 +39,65 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 
-public class MainActivityFragment extends Fragment {
 
-    Movie[] movieArray;
-    ImageAdapter imageAdapter;
-    ArrayList<Movie> movieArrayList;
+public class MainActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    public static final String ARG_TWO_PANE_MODE = "ARG_TWO_PANE_MODE";
+
+    private static final String TAG = MainActivityFragment.class.getSimpleName();
+
+    private static final String STATE_SORT_ORDER = "STATE_SORT_ORDER";
+    private static final String STATE_MOVIES = "STATE_MOVIES";
+    private static final String STATE_SELECTED_POSITION = "STATE_SELECTED_POSITION";
+
+    private static final String PREFERENCE_KEY = "com.example.julian.popularmovies.MOVIES_LIST_PREFERENCES";
+
+    private static final String SORT_FAVORITES = "SORT_FAVORITES";
+
+    private static final int FAVORITES_LOADER = 1;
+    private static final int FAVORITES_LOADER_RESTORED = 2;
+
+    private String mSortOrder = Utility.SORT_POPULARITY_DESC;
+    private String mNewSortOrder = mSortOrder;
+
+    @Bind(R.id.empty) TextView mNoFavoritesText;
+    @Bind(R.id.error) TextView mErrorText;
+    @Bind(R.id.retry) Button mRetryButton;
+    @Bind(R.id.progress) ContentLoadingProgressBar mProgressBar;
+    @Bind(R.id.recycler_view) RecyclerView mRecyclerView;
+
+    private boolean mInProgress;
+    private boolean mTwoPanemode;
+
+    private int mSelecetedPostion = 0;
+    private MovieCursorAdapter movieCursorAdapter;
+//
+//    Movie[] movieArray;
+//    ImageAdapter imageAdapter;
+//    ArrayList<Movie> movieArrayList;
 
     public MainActivityFragment() {
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        if(savedInstanceState == null || !savedInstanceState.containsKey("movieKey")){
-            movieArrayList = new ArrayList<Movie>();
-            updateMovie();
-        } else {
-            movieArrayList = savedInstanceState.getParcelableArrayList("movieKey");
-        }
         super.onCreate(savedInstanceState);
+
+        setHasOptionsMenu(true);
+        Bundle args = getArguments();
+        if(args != null){
+            mTwoPanemode = args.getBoolean(ARG_TWO_PANE_MODE);
+        }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        if(movieArrayList != null){
-            outState.putParcelableArrayList("movieKey", movieArrayList);
+        if(mRecyclerView.getAdapter() != null){
+            MovieCursorAdapter adapter = (MovieCursorAdapter) mRecyclerView.getAdapter();
+            outState.putInt(STATE_SELECTED_POSITION, adapter.getSelectedPosition());
         }
         super.onSaveInstanceState(outState);
     }
@@ -81,6 +122,7 @@ public class MainActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        ButterKnife.bind(this, rootView);
 
         GridView gridView = (GridView) rootView.findViewById(R.id.gridView);
 
@@ -163,6 +205,25 @@ public class MainActivityFragment extends Fragment {
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
         return networkInfo != null && networkInfo.isConnected();
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return null;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
+
+    public interface Listener {
+        void onItemSelected(Movie movie);
     }
 
     // TODO: Delete this block of code
