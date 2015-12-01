@@ -1,4 +1,4 @@
-package com.example.julian.popularmovie;
+package com.example.julian.popularmovie.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -13,16 +13,6 @@ public class Movie implements Parcelable {
     private Date releaseDate;
     private String poster;
     private float voteAverage;
-//    private float rating;
-
-//    public Movie(long id, String title, String description, Date releaseDate, String poster, float voteAverage) {
-//        this.id          = id;
-//        this.title       = title;
-//        this.description = description;
-//        this.releaseDate = releaseDate;
-//        this.poster      = poster;
-//        this.voteAverage = voteAverage;
-//    }
 
     public Movie(){}
 

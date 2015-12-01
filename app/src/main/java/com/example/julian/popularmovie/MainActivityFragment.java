@@ -2,7 +2,6 @@ package com.example.julian.popularmovie;
 
 import android.app.LoaderManager;
 import android.content.Context;
-import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -14,6 +13,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.ContentLoadingProgressBar;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,10 +22,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
-import android.widget.GridView;
 import android.widget.TextView;
+
+import com.example.julian.popularmovie.model.Movie;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -70,14 +71,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     @Bind(R.id.recycler_view) RecyclerView mRecyclerView;
 
     private boolean mInProgress;
-    private boolean mTwoPanemode;
+    private boolean mTwoPaneMode;
 
-    private int mSelecetedPostion = 0;
+    private int mSelectedPosition = 0;
     private MovieCursorAdapter movieCursorAdapter;
-//
-//    Movie[] movieArray;
-//    ImageAdapter imageAdapter;
-//    ArrayList<Movie> movieArrayList;
 
     public MainActivityFragment() {
     }
@@ -89,13 +86,71 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         setHasOptionsMenu(true);
         Bundle args = getArguments();
         if(args != null){
-            mTwoPanemode = args.getBoolean(ARG_TWO_PANE_MODE);
+            mTwoPaneMode = args.getBoolean(ARG_TWO_PANE_MODE);
         }
     }
 
     @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        ButterKnife.bind(this, rootView);
+
+        mRecyclerView.setHasFixedSize(true);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 2,
+                GridLayoutManager.VERTICAL, false);
+        mRecyclerView.setLayoutManager(gridLayoutManager);
+        mRetryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                refresh();
+            }
+        });
+
+        mNewSortOrder = mSortOrder = getActivity()
+                .getSharedPreferences(PREFERENCE_KEY, Context.MODE_PRIVATE)
+                .getString(STATE_SORT_ORDER, mSortOrder);
+
+        ArrayList<Movie> movies = null;
+        boolean restoredState = false;
+        if(savedInstanceState !=  null){
+            movies = savedInstanceState.getParcelableArrayList(STATE_MOVIES);
+            mSelectedPosition = savedInstanceState.getInt(STATE_SELECTED_POSITION);
+            restoredState = true;
+        }
+
+        if(movies != null) {
+            mRecyclerView.setAdapter(new MovieAdapter(getActivity(),
+                    movies,
+                    (Listener) getActivity(),
+                    mTwoPaneMode,
+                    mSelectedPosition,
+                    false));
+        } else {
+            final boolean finalRestoredState = restoredState;
+            mProgressBar.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    refresh(finalRestoredState);
+                    mProgressBar.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                }
+            });
+        }
+        return rootView;
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle outState) {
-        if(mRecyclerView.getAdapter() != null){
+        if (mRecyclerView.getAdapter() instanceof MovieAdapter)
+        {
+            MovieAdapter adapter = (MovieAdapter) mRecyclerView.getAdapter();
+            outState.putParcelableArrayList(STATE_MOVIES, adapter.getItems());
+            outState.putInt(STATE_SELECTED_POSITION, adapter.getSelectedPosition());
+        }
+        else if (mRecyclerView.getAdapter() instanceof MovieCursorAdapter)
+        {
+            // don't save items (the loader will reload data)
             MovieCursorAdapter adapter = (MovieCursorAdapter) mRecyclerView.getAdapter();
             outState.putInt(STATE_SELECTED_POSITION, adapter.getSelectedPosition());
         }
@@ -118,40 +173,20 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
-        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        ButterKnife.bind(this, rootView);
-
-        GridView gridView = (GridView) rootView.findViewById(R.id.gridView);
-
-        imageAdapter  = new ImageAdapter(getActivity(), movieArrayList);
-        gridView.setAdapter(imageAdapter);
-        imageAdapter.notifyDataSetChanged();
-
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getActivity(), DetailActivity.class);
-                intent.putExtra("original_title", movieArrayList.get(position).title);
-                intent.putExtra("overview", movieArrayList.get(position).description);
-                intent.putExtra("poster_path", movieArrayList.get(position).poster);
-                intent.putExtra("release_date", movieArrayList.get(position).releaseDate);
-                intent.putExtra("vote_average", movieArrayList.get(position).voteAverage);
-                startActivity(intent);
-            }
-        });
-        setHasOptionsMenu(true);
-
-        return rootView;
-    }
-
-    @Override
     public void onResume() {
         SharedPreferences prefs =PreferenceManager.getDefaultSharedPreferences(getActivity());
         prefs.registerOnSharedPreferenceChangeListener(listener);
         super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        getActivity().getSharedPreferences(PREFERENCE_KEY, Context.MODE_PRIVATE)
+                .edit()
+                .putString(STATE_SORT_ORDER, mSortOrder)
+                .apply();
     }
 
     @Override

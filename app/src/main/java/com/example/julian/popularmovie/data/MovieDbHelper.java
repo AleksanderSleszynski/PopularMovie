@@ -7,9 +7,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.example.julian.popularmovie.Movie;
-import com.example.julian.popularmovie.Review;
-import com.example.julian.popularmovie.Video;
+import com.example.julian.popularmovie.model.Movie;
+import com.example.julian.popularmovie.model.Review;
+import com.example.julian.popularmovie.model.Video;
 import com.example.julian.popularmovie.data.MovieContract.MovieEntry;
 import com.example.julian.popularmovie.data.MovieContract.ReviewEntry;
 import com.example.julian.popularmovie.data.MovieContract.VideoEntry;

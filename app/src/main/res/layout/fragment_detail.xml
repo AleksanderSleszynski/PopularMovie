@@ -1,69 +1,162 @@
-<ScrollView
-    android:layout_height="match_parent"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:style="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    android:layout_height="match_parent">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        tools:context="com.example.julian.popularmovie.DetailActivityFragment">
+        android:paddingBottom="16dp">
 
-        <TextView
-            android:id="@+id/detail_title"
+        <RelativeLayout
+            android:id="@+id/main_section"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#009688"
-            android:gravity="center"
-            android:paddingBottom="20dp"
-            android:paddingTop="20dp"
-            android:text=""
-            android:textColor="#FFFFFF"
-            android:textSize="40sp" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="2dp"
-            android:layout_marginBottom="10dp">
+            android:layout_height="wrap_content">
 
             <ImageView
-                android:id="@+id/detail_poster"
+                android:id="@+id/favorite"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginEnd="4dp"
+                android:layout_marginRight="4dp"
+                android:layout_marginTop="9dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/accessibility_action_favorite"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_favorite_outline_24dp"
+                android:visibility="invisible" />
+
+            <ImageView
+                android:id="@+id/poster"
+                android:layout_width="120dp"
+                android:layout_height="180dp"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:contentDescription="@string/accessibility_poster_description"
+                android:scaleType="fitCenter"
+                tools:background="@color/no_image_bg_color"
+                tools:src="@drawable/sample_0" />
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@id/poster"
+                android:layout_marginEnd="-10dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="-10dp"
+                android:layout_marginStart="16dp"
+                android:layout_toEndOf="@id/poster"
+                android:layout_toLeftOf="@id/favorite"
+                android:layout_toRightOf="@id/poster"
+                android:layout_toStartOf="@id/favorite"
+                tools:text="Movie Title" />
+
+            <TextView
+                android:id="@+id/release_date"
+                style="@style/Base.TextAppearance.AppCompat.Body2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@id/title"
+                android:layout_alignStart="@id/title"
+                android:layout_below="@id/title"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="8dp"
+                tools:text="October 13, 2015" />
+
+            <TextView
+                android:id="@+id/rating"
+                style="@style/Base.TextAppearance.AppCompat.Headline"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"/>
+                android:layout_alignLeft="@id/title"
+                android:layout_alignStart="@id/title"
+                android:layout_below="@id/release_date"
+                android:layout_marginTop="8dp"
+                tools:text="10" />
 
-            <LinearLayout
+            <TextView
+                style="@style/Base.TextAppearance.AppCompat.Headline"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginLeft="40dp">
+                android:layout_below="@id/release_date"
+                android:layout_marginTop="8dp"
+                android:layout_toEndOf="@id/rating"
+                android:layout_toRightOf="@id/rating"
+                android:text="@string/rating_10"
+                android:textColor="?android:attr/textColorSecondary" />
 
-                <TextView
-                    android:id="@+id/detail_release_date"
+            <TextView
+                android:id="@+id/synopsis"
+                style="@style/Base.TextAppearance.AppCompat.Body1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/poster"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="16dp"
+                tools:text="Random Text Random text" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/trailers_selection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/trailers_label"
+                style="@style/sub_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:text="@string/section_trailers" />
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="190dp">
+
+                <LinearLayout
+                    android:id="@+id/trailers_container"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="30sp"
-                    android:textColor="#9E9E9E"/>
-
-                <TextView
-                    android:id="@+id/detail_vote_average"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="20sp"
-                    android:textColor="#000000"/>
-
-            </LinearLayout>
+                    android:orientation="horizontal" />
+            </HorizontalScrollView>
 
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/detail_description"
+        <LinearLayout
+            android:id="@+id/reviews_section"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="15sp"
-            android:textColor="#9E9E9E"/>
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/reviews_label"
+                style="@style/sub_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/section_reviews" />
+
+            <LinearLayout
+                android:id="@+id/reviews_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+        </LinearLayout>
+
     </LinearLayout>
 </ScrollView>

@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.example.julian.popularmovie.data.MovieContract;
+import com.example.julian.popularmovie.model.Movie;
 
 import org.json.JSONArray;
 import org.json.JSONException;

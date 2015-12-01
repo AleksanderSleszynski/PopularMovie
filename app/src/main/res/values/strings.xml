@@ -12,6 +12,12 @@
     <string name="title_activity_settings">SettingsActivity</string>
     <string name="empty">No favorite movies</string>
     <string name="retry">Retry</string>
+    <string name="accessibility_action_favorite">Favorite</string>
+    <string name="accessibility_poster_description">Poster</string>
+    <string name="rating_10">/ 10</string>
+    <string name="section_trailers">Trailers</string>
+    <string name="section_reviews">Reviews</string>
+    <string name="accessibility_trailer_thumbnail_description">Trailer thumbnail</string>
 
 
 </resources>
