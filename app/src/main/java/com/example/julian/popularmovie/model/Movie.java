@@ -3,6 +3,7 @@ package com.example.julian.popularmovie.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 public class Movie implements Parcelable {
@@ -52,6 +53,12 @@ public class Movie implements Parcelable {
         dest.writeLong(releaseDate != null ? releaseDate.getTime() : 0);
         dest.writeString(poster);
         dest.writeFloat(voteAverage);
+    }
+
+    private ArrayList<Movie> results;
+
+    public ArrayList<Movie> getMovies() {
+        return results;
     }
 
     public String getPosterUrl(){

@@ -106,7 +106,7 @@
         </RelativeLayout>
 
         <LinearLayout
-            android:id="@+id/trailers_selection"
+            android:id="@+id/trailers_section"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"

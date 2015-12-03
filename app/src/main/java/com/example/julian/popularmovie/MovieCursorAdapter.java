@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.example.julian.popularmovie.activity.MainActivityFragment;
 import com.example.julian.popularmovie.data.MovieDbHelper;
 import com.example.julian.popularmovie.model.Movie;
 import com.squareup.picasso.Picasso;

@@ -2,7 +2,7 @@
     <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
-        tools:context=".MainActivityFragment"
+        tools:context=".activity.MainActivityFragment"
         android:layout_width="match_parent"
         android:numColumns="auto_fit"
         android:layout_height="match_parent" >

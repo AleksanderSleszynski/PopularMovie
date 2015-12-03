@@ -2,10 +2,19 @@ package com.example.julian.popularmovie;
 
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
+import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.Uri;
+import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
+import android.widget.Toast;
 
 import com.example.julian.popularmovie.model.Video;
 import com.google.gson.FieldNamingPolicy;
@@ -34,6 +43,8 @@ public class Utility {
 
     private static final String IMAGES_BASE_URL = "https://image.tmdb.org/t/p/";
     private static TheMovieDbService sInstance;
+
+    private static final int[] TEMP_ARRAY = new int[1];
 
     public static TheMovieDbService getInstance(){
         if (sInstance == null){
@@ -90,6 +101,17 @@ public class Utility {
     }
 
 
+    public static int getThemeAttrColor(Context context, int attr) {
+        TEMP_ARRAY[0] = attr;
+        TypedArray a = context.obtainStyledAttributes(null, TEMP_ARRAY);
+        try {
+            return a.getColor(0, 0);
+        }
+        finally {
+            a.recycle();
+        }
+    }
+
     public static Drawable getTintedDrawable(Context context, int resId, int tint) {
         Drawable drawable = ContextCompat.getDrawable(context, resId);
         drawable = drawable.mutate();
@@ -98,5 +120,44 @@ public class Utility {
         return drawable;
     }
 
+    public static boolean isConnectedToInternet(Context context) {
+        ConnectivityManager cm =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected();
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    public static boolean isActivityDestroyed(Activity activity)
+    {
+        return activity == null || Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1
+                && activity.isDestroyed();
+    }
+
+    public static void startYouTubeVideo(Context context, String videoId) {
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + videoId));
+            context.startActivity(intent);
+        } catch (ActivityNotFoundException ex) {
+            Intent intent = new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("http://www.youtube.com/watch?v=" + videoId));
+            context.startActivity(intent);
+        }
+    }
+
+    public static void shareYoutubeVideo(Context context, String videoId) {
+        try {
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("text/plain");
+            shareIntent.putExtra(Intent.EXTRA_TEXT, "http://www.youtube.com/watch?v=" + videoId);
+            context.startActivity(shareIntent);
+        } catch (ActivityNotFoundException ex) {
+            Toast.makeText(context, R.string.error_share_youtube, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public static int dpToPx(Context context, float dp) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dp * scale + 0.5f);
+    }
 
 }

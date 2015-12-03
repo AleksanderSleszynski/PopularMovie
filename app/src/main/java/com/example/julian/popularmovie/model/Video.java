@@ -4,12 +4,15 @@ package com.example.julian.popularmovie.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
+
 public class Video implements Parcelable{
 
     public static final String SITE_YOUTUBE = "YouTube";
 
     private String site;
     private String key;
+    ArrayList<Video> results;
 
     public Video() {}
 
@@ -48,6 +51,10 @@ public class Video implements Parcelable{
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(site);
         dest.writeString(key);
+    }
+
+    public ArrayList<Video> getVideos() {
+        return results;
     }
 
     public String getSite() {

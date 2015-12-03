@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:divider="?android:attr/dividerHorizontal"
     android:baselineAligned="false"
-    tools:context=".activitiy.MainActivity">
+    tools:context=".activity.MainActivity">
 
     <FrameLayout
         android:id="@+id/main_container"

@@ -1,4 +1,4 @@
-package com.example.julian.popularmovie.activitiy;
+package com.example.julian.popularmovie.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,10 +6,8 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 
-import com.example.julian.popularmovie.DetailActivity;
-import com.example.julian.popularmovie.DetailActivityFragment;
-import com.example.julian.popularmovie.MainActivityFragment;
 import com.example.julian.popularmovie.R;
+import com.example.julian.popularmovie.Utility;
 import com.example.julian.popularmovie.model.Movie;
 
 
@@ -47,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    if(Utility.isActivityDestroyed(MainActivity.this))return;
                     if(movie != null){
                         Bundle args = new Bundle();
                         args.putParcelable(DetailActivityFragment.ARG_MOVIE, movie);
@@ -73,28 +72,4 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
             startActivity(intent);
         }
     }
-
-//    ToDo: Important Note remember to check if I need this
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.menu_main, menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//
-//        //noinspection SimplifiableIfStatementN
-//        if (id == R.id.action_settings) {
-//            startActivity(new Intent(this, SettingsActivity.class));
-//            return true;
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
 }
