@@ -37,8 +37,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         mSingleChoiceMode = singleChoiceMode;
         mSelectedPosition = selectedPosition;
 
-        mPlaceholder = ContextCompat.getDrawable(context, R.drawable.sample_0);
-        mNoImageDrawable = Utility.getTintedDrawable(context, R.drawable.sample_0, 0);
+        mPlaceholder = ContextCompat.getDrawable(context, R.drawable.poster_placeholder);
+        mNoImageDrawable = Utility.getTintedDrawable(context, R.drawable.no_image_placeholder,
+                Utility.getThemeAttrColor(context, android.R.attr.textColorSecondary));
 
         if(mSingleChoiceMode){
             mSelectedBackground = ContextCompat.getDrawable(context, R.drawable.selected_background);
@@ -63,18 +64,16 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
                     position == mSelectedPosition ? mSelectedBackground : null);
         }
 
-        String posterPath = mMovies.get(position).getPoster();
+        String posterPath = mMovies.get(position).getPosterPath();
         if(posterPath == null){
             holder.mPoster.setImageDrawable(mNoImageDrawable);
             return;
         }
-
         Picasso.with(holder.mPoster.getContext())
-                .load(Utility.getPosterUrl(mMovies.get(position).getPoster()))
+                .load(Utility.getPosterUrl(mMovies.get(position).getPosterPath()))
                 .placeholder(mPlaceholder)
                 .error(mNoImageDrawable)
                 .into(holder.mPoster);
-
     }
 
     @Override

@@ -3,27 +3,26 @@ package com.example.julian.popularmovie.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.ArrayList;
 import java.util.Date;
 
 public class Movie implements Parcelable {
 
     private long id;
-    private String title;
-    private String description;
+    private String originalTitle;
+    private String overview;
     private Date releaseDate;
-    private String poster;
+    private String posterPath;
     private float voteAverage;
 
     public Movie(){}
 
     protected Movie(Parcel in) {
         id          = in.readLong();
-        title       = in.readString();
-        description = in.readString();
+        originalTitle = in.readString();
+        overview = in.readString();
         long time   = in.readLong();
         releaseDate = time != 0 ? new Date(time) : null;
-        poster      = in.readString();
+        posterPath = in.readString();
         voteAverage = in.readFloat();
     }
 
@@ -48,41 +47,31 @@ public class Movie implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(id);
-        dest.writeString(title);
-        dest.writeString(description);
+        dest.writeString(originalTitle);
+        dest.writeString(overview);
         dest.writeLong(releaseDate != null ? releaseDate.getTime() : 0);
-        dest.writeString(poster);
+        dest.writeString(posterPath);
         dest.writeFloat(voteAverage);
-    }
-
-    private ArrayList<Movie> results;
-
-    public ArrayList<Movie> getMovies() {
-        return results;
-    }
-
-    public String getPosterUrl(){
-        return this.poster;
     }
 
     public void setId(long id) {
         this.id = id;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setOriginalTitle(String originalTitle) {
+        this.originalTitle = originalTitle;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setOverview(String overview) {
+        this.overview = overview;
     }
 
     public void setReleaseDate(Date releaseDate) {
         this.releaseDate = releaseDate;
     }
 
-    public void setPoster(String poster) {
-        this.poster = poster;
+    public void setPosterPath(String poster) {
+        this.posterPath = poster;
     }
 
     public void setVoteAverage(float voteAverage) {
@@ -93,20 +82,20 @@ public class Movie implements Parcelable {
         return id;
     }
 
-    public String getTitle() {
-        return title;
+    public String getOriginalTitle() {
+        return originalTitle;
     }
 
-    public String getDescription() {
-        return description;
+    public String getOverview() {
+        return overview;
     }
 
     public Date getReleaseDate() {
         return releaseDate;
     }
 
-    public String getPoster() {
-        return poster;
+    public String getPosterPath() {
+        return posterPath;
     }
 
     public float getVoteAverage() {

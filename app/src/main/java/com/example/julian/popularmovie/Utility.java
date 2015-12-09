@@ -8,12 +8,15 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.TypedArray;
+import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
+import android.view.Display;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.example.julian.popularmovie.model.Video;
@@ -100,6 +103,18 @@ public class Utility {
         return "http://img.youtube.com/vi/" + video.getKey() + "/hqdefault.jpg";
     }
 
+    public static int getScreenWidthDp(Context context) {
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+
+        return pxToDp(context, size.x);
+    }
+
+    public static int pxToDp(Context context, int px) {
+        return Math.round(px / context.getResources().getDisplayMetrics().density);
+    }
 
     public static int getThemeAttrColor(Context context, int attr) {
         TEMP_ARRAY[0] = attr;

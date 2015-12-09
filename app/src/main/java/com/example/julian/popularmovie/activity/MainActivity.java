@@ -45,7 +45,9 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    if(Utility.isActivityDestroyed(MainActivity.this))return;
+                    if(Utility.isActivityDestroyed(MainActivity.this)) {
+                        return;
+                    }
                     if(movie != null){
                         Bundle args = new Bundle();
                         args.putParcelable(DetailActivityFragment.ARG_MOVIE, movie);

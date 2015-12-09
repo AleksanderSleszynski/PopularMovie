@@ -30,6 +30,8 @@ public class TestDb extends AndroidTestCase {
 
         final HashSet<String> tableNameHashSet = new HashSet<String>();
         tableNameHashSet.add(MovieContract.MovieEntry.TABLE_NAME);
+        tableNameHashSet.add(MovieContract.ReviewEntry.TABLE_NAME);
+        tableNameHashSet.add(MovieContract.VideoEntry.TABLE_NAME);
 
         mContext.deleteDatabase(MovieDbHelper.DATABASE_NAME);
         SQLiteDatabase db = new MovieDbHelper(this.mContext).getWritableDatabase();
@@ -59,12 +61,11 @@ public class TestDb extends AndroidTestCase {
         // Build a HashSet of all of the column names we want to look for
         final HashSet<String> movieColumnHashSet = new HashSet<String>();
         movieColumnHashSet.add(MovieContract.MovieEntry._ID);
-        movieColumnHashSet.add(MovieContract.MovieEntry.COLUMN_TITLE);
+        movieColumnHashSet.add(MovieContract.MovieEntry.COLUMN_ORIGINAL_TITLE);
+        movieColumnHashSet.add(MovieContract.MovieEntry.COLUMN_OVERVIEW);
         movieColumnHashSet.add(MovieContract.MovieEntry.COLUMN_RELEASE_DATE);
-        movieColumnHashSet.add(MovieContract.MovieEntry.COLUMN_DESCRIPTION);
-        movieColumnHashSet.add(MovieContract.MovieEntry.COLUMN_AVERAGE_VOTE);
         movieColumnHashSet.add(MovieContract.MovieEntry.COLUMN_POSTER_PATH);
-        movieColumnHashSet.add(MovieContract.MovieEntry.COLUMN_FAVOURITE);
+        movieColumnHashSet.add(MovieContract.MovieEntry.COLUMN_AVERAGE_VOTE);
 
         int columnNameIndex = c.getColumnIndex("name");
         do {

@@ -1,5 +1,4 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:style="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -33,15 +32,15 @@
 
             <ImageView
                 android:id="@+id/poster"
-                android:layout_width="120dp"
-                android:layout_height="180dp"
+                android:layout_width="150dp"
+                android:layout_height="200dp"
                 android:layout_marginLeft="@dimen/activity_horizontal_margin"
                 android:layout_marginStart="@dimen/activity_horizontal_margin"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
                 android:contentDescription="@string/accessibility_poster_description"
                 android:scaleType="fitCenter"
                 tools:background="@color/no_image_bg_color"
-                tools:src="@drawable/sample_0" />
+                tools:src="@drawable/no_image_placeholder" />
 
             <TextView
                 android:id="@+id/title"
@@ -56,6 +55,8 @@
                 android:layout_toLeftOf="@id/favorite"
                 android:layout_toRightOf="@id/poster"
                 android:layout_toStartOf="@id/favorite"
+                android:textSize="24sp"
+                android:textStyle="bold"
                 tools:text="Movie Title" />
 
             <TextView

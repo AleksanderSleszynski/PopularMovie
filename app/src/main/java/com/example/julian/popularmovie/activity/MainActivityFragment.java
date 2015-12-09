@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -13,6 +14,7 @@ import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -53,7 +55,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     private static final String STATE_MOVIES = "STATE_MOVIES";
     private static final String STATE_SELECTED_POSITION = "STATE_SELECTED_POSITION";
 
-    private static final String PREFERENCE_KEY = "com.example.julian.popularmovies.MOVIES_LIST_PREFERENCES";
+    private static final String PREFERENCE_KEY = "com.example.julian.popularmovie.MOVIES_LIST_PREFERENCES";
 
     private static final String SORT_FAVORITES = "SORT_FAVORITES";
 
@@ -63,16 +65,11 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     private String mSortOrder = Utility.SORT_POPULARITY_DESC;
     private String mNewSortOrder = mSortOrder;
 
-    @Bind(R.id.empty)
-    TextView mNoFavoritesText;
-    @Bind(R.id.error)
-    TextView mErrorText;
-    @Bind(R.id.retry)
-    Button mRetryButton;
-    @Bind(R.id.progress)
-    ContentLoadingProgressBar mProgressBar;
-    @Bind(R.id.recycler_view)
-    RecyclerView mRecyclerView;
+    @Bind(R.id.empty) TextView mNoFavoritesText;
+    @Bind(R.id.error) TextView mErrorText;
+    @Bind(R.id.progress) ContentLoadingProgressBar mProgressBar;
+    @Bind(R.id.retry) Button mRetryButton;
+    @Bind(R.id.recycler_view) RecyclerView mRecyclerView;
 
     private boolean mInProgress;
     private boolean mTwoPaneMode;
@@ -94,6 +91,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         }
     }
 
+    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -101,8 +99,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         ButterKnife.bind(this, rootView);
 
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 2,
+
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), getColumnNumber(),
                 GridLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(gridLayoutManager);
         mRetryButton.setOnClickListener(new View.OnClickListener() {
@@ -148,17 +148,25 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     @Override
     public void onSaveInstanceState(Bundle outState) {
         if (mRecyclerView.getAdapter() != null) {
+
             if (mRecyclerView.getAdapter() instanceof MovieAdapter) {
                 MovieAdapter adapter = (MovieAdapter) mRecyclerView.getAdapter();
                 outState.putParcelableArrayList(STATE_MOVIES, adapter.getItems());
                 outState.putInt(STATE_SELECTED_POSITION, adapter.getSelectedPosition());
+
             } else if (mRecyclerView.getAdapter() instanceof MovieCursorAdapter) {
                 // don't save items (the loader will reload data)
                 MovieCursorAdapter adapter = (MovieCursorAdapter) mRecyclerView.getAdapter();
                 outState.putInt(STATE_SELECTED_POSITION, adapter.getSelectedPosition());
             }
+
             super.onSaveInstanceState(outState);
         }
+    }
+
+    private int getColumnNumber() {
+        float thumbSize = mTwoPaneMode ? 300.0f : 200.0f;
+        return Math.max(2, Math.round(Utility.getScreenWidthDp(getActivity()) / thumbSize));
     }
 
     @Override
@@ -233,7 +241,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         if (!mNewSortOrder.equals(SORT_FAVORITES)) {
             return;
         }
-
+            Log.d(TAG, "onLoadFinished");
         setUiInProgress(false);
         mSortOrder = mNewSortOrder;
 

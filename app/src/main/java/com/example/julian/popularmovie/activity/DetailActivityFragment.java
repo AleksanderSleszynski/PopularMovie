@@ -23,10 +23,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
 import com.example.julian.popularmovie.R;
 import com.example.julian.popularmovie.Utility;
 import com.example.julian.popularmovie.WeakAsyncTask;
@@ -40,6 +36,7 @@ import com.example.julian.popularmovie.model.Review;
 import com.example.julian.popularmovie.model.ReviewResponse;
 import com.example.julian.popularmovie.model.Video;
 import com.example.julian.popularmovie.model.VideoResponse;
+import com.squareup.picasso.Picasso;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -51,7 +48,8 @@ import retrofit.client.Response;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class DetailActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, WeakAsyncTask.WeakAsyncTaskCallbacks {
+public class DetailActivityFragment extends Fragment
+        implements LoaderManager.LoaderCallbacks<Cursor>, WeakAsyncTask.WeakAsyncTaskCallbacks {
 
     public static final String ARG_MOVIE = "ARG_MOVIE";
 
@@ -66,6 +64,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     private static final int VIDEOS_TAG = 1;
     private static final int REVIEWS_TAG = 2;
 
+
     private Movie mMovie;
     private Boolean mMovieIsFavorite;
 
@@ -74,7 +73,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     private ArrayList<Video> mTrailers = new ArrayList<>(0);
     private LinearLayout mTrailersContainer;
     private View mTrailersSection;
-    private boolean mTrailersInitilized = false;
+    private boolean mTrailersInitialized = false;
 
     private ArrayList<Review> mReviews = new ArrayList<>(0);
     private LinearLayout mReviewsContainer;
@@ -96,7 +95,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     }
 
 
-
+    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -109,7 +108,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         }
 
         TextView tv = (TextView) rootView.findViewById(R.id.title);
-        tv.setText(mMovie.getTitle());
+        tv.setText(mMovie.getOriginalTitle());
 
         tv = (TextView) rootView.findViewById(R.id.release_date);
         if (mMovie.getReleaseDate() != null) {
@@ -124,41 +123,20 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         tv.setText(rating);
 
         tv = (TextView) rootView.findViewById(R.id.synopsis);
-        tv.setText(mMovie.getDescription());
+        tv.setText(mMovie.getOverview());
 
         final ImageView poster = (ImageView) rootView.findViewById(R.id.poster);
         mNoImageDrawable = Utility.getTintedDrawable(getActivity(),
-                R.drawable.sample_0,
-                0);
+                R.drawable.no_image_placeholder,
+                Utility.getThemeAttrColor(getActivity(), android.R.attr.textColorSecondary));
 
-        if (mMovie.getPoster() == null) {
+        if (mMovie.getPosterPath() == null) {
             poster.setImageDrawable(mNoImageDrawable);
             poster.setBackgroundColor(getResources().getColor(R.color.no_image_bg_color));
         } else {
-            Glide.with(getContext())
-                    .load(Utility.getPosterUrl(mMovie.getPoster(), Utility.POSTER_SIZE_342))
+            Picasso.with(getActivity())
+                    .load(Utility.getPosterUrl(mMovie.getPosterPath(), Utility.POSTER_SIZE_342))
                     .error(mNoImageDrawable)
-                    .listener(new RequestListener<String, GlideDrawable>()
-                    {
-                        @Override
-                        public boolean onException(Exception e, String model,
-                                                   Target<GlideDrawable> target,
-                                                   boolean isFirstResource)
-                        {
-                            poster.setBackgroundColor(
-                                    getResources().getColor(R.color.no_image_bg_color));
-                            return false;
-                        }
-
-                        @Override
-                        public boolean onResourceReady(GlideDrawable resource, String model,
-                                                       Target<GlideDrawable> target,
-                                                       boolean isFromMemoryCache,
-                                                       boolean isFirstResource)
-                        {
-                            return false;
-                        }
-                    })
                     .into(poster);
         }
 
@@ -170,7 +148,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
             {
                 // haven't completed all requests
                 if (mMovieIsFavorite == null
-                        || !mTrailersInitilized
+                        || !mTrailersInitialized
                         || !mReviewsInitialized)
                 {
                     return;
@@ -250,9 +228,8 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
             thumbnail.setPadding(leftPadding, thumbnail.getPaddingTop(),
                     thumbnail.getPaddingRight(), thumbnail.getPaddingBottom());
 
-            Glide.with(this)
+            Picasso.with(getActivity())
                     .load(Utility.getTrailerThumbnailUrl(video))
-                    .crossFade()
                     .error(mNoImageDrawable)
                     .into(iv);
 
@@ -270,7 +247,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
             mTrailersSection.setVisibility(View.VISIBLE);
         }
 
-        mTrailersInitilized = true;
+        mTrailersInitialized = true;
         getActivity().supportInvalidateOptionsMenu();
     }
 
@@ -303,7 +280,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        mShareMenuItem.setVisible(!mTrailersInitilized || mTrailersSection == null
+        mShareMenuItem.setVisible(!mTrailersInitialized || mTrailersSection == null
                 || mTrailersSection.getVisibility() == View.VISIBLE);
 
     }
@@ -354,10 +331,8 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         int id = loader.getId();
         if (id == FAVOURITE_TAG) {
-
             mMovieIsFavorite = data.moveToFirst();
             setFavoriteIcon(mMovieIsFavorite);
-
             Utility.getInstance().listVideos(mMovie.getId(), new VideosResponseCallback(this));
             Utility.getInstance().listReviews(mMovie.getId(), new ReviewsResponseCallback(this));
         } else if (id == VIDEOS_TAG) {
@@ -498,7 +473,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         public void failure(RetrofitError error) {
             DetailActivityFragment fragment = getWeakFragment();
             if (fragment != null) {
-                fragment.mTrailersInitilized = true;
+                fragment.mTrailersInitialized = true;
                 fragment.processApiError(error);
 
                 if (fragment.mMovieIsFavorite) {

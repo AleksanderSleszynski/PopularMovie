@@ -23,6 +23,7 @@
     <string name="sort_by">Sort by</string>
     <string name="error_no_internet">No internet connection</string>
     <string name="error_share_youtube">No app that support sharing YouTube videos</string>
+    <string name="favorites">Favorites</string>
 
 
 </resources>

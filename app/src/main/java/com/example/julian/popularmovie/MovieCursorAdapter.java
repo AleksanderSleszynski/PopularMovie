@@ -38,8 +38,9 @@ public class MovieCursorAdapter extends RecyclerView.Adapter<MovieCursorAdapter.
         mSingleChoiceMode = singleChoiceMode;
         mSelectedPosition = selectedPosition;
 
-        mPlaceholder = ContextCompat.getDrawable(context, R.drawable.sample_0);
-        mNoImageDrawable = Utility.getTintedDrawable(context, R.drawable.sample_0, 0);
+        mPlaceholder = ContextCompat.getDrawable(context, R.drawable.poster_placeholder);
+        mNoImageDrawable = Utility.getTintedDrawable(context, R.drawable.no_image_placeholder,
+                Utility.getThemeAttrColor(context, android.R.attr.textColorSecondary));
 
         if(mSingleChoiceMode){
             mSelectedBackground = ContextCompat.getDrawable(context, R.drawable.selected_background);
@@ -60,7 +61,9 @@ public class MovieCursorAdapter extends RecyclerView.Adapter<MovieCursorAdapter.
 
     @Override
     public void onBindViewHolder(MovieCursorAdapter.ViewHolder holder, int position){
-        if(!mCursor.moveToPosition(position)){return;}
+        if(!mCursor.moveToPosition(position)){
+            return;
+        }
 
         if(mSingleChoiceMode){
             holder.mContainer.setBackground(
@@ -69,9 +72,10 @@ public class MovieCursorAdapter extends RecyclerView.Adapter<MovieCursorAdapter.
 
         Movie movie= MovieDbHelper.toMovie(mCursor);
 
-        String posterPath = movie.getPoster();
+        String posterPath = movie.getPosterPath();
         if(posterPath == null){
             holder.mPoster.setImageDrawable(mNoImageDrawable);
+            return;
         }
 
         Picasso.with(holder.mPoster.getContext())
@@ -121,7 +125,9 @@ public class MovieCursorAdapter extends RecyclerView.Adapter<MovieCursorAdapter.
     }
 
     public Cursor swapCursor(Cursor cursor){
-        if (mCursor == cursor) return null;
+        if (mCursor == cursor){
+            return null;
+        }
 
         boolean needsNotification = false;
         if(mSingleChoiceMode){
@@ -182,10 +188,12 @@ public class MovieCursorAdapter extends RecyclerView.Adapter<MovieCursorAdapter.
                         }
                         mSelectedPosition = newSelectedPosition;
                         mContainer.setBackground(mSelectedBackground);
-
-                        notifySelectedPosition(newSelectedPosition);
+                    } else if (mSingleChoiceMode) {
+                            return;
                     }
+                    notifySelectedPosition(newSelectedPosition);
                 }
+
             });
         }
     }

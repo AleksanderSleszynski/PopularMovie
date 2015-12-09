@@ -6,6 +6,7 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 public class MovieProvider extends ContentProvider {
@@ -24,35 +25,25 @@ public class MovieProvider extends ContentProvider {
             + "." + MovieContract.MovieEntry._ID + " = ? ";
 
     public static final String VIDEOS_BY_MOVIE_SELECTION = MovieContract.VideoEntry.TABLE_NAME
-            + "." + MovieContract.VideoEntry.COLUMNT_MOVIE_ID + " = ? ";
+            + "." + MovieContract.VideoEntry.COLUMN_MOVIE_ID + " = ? ";
 
     public static final String REVIEWS_BY_MOVIE_SELECTION = MovieContract.ReviewEntry.TABLE_NAME
             + "." + MovieContract.ReviewEntry.COLUMN_MOVIE_ID + " = ? ";
 
-//    private static final SQLiteQueryBuilder sMovieSettingQueryBuilder;
-//
-//    static {
-//        sMovieSettingQueryBuilder = new SQLiteQueryBuilder();
-//        sMovieSettingQueryBuilder.setTables(MovieContract.MovieEntry.TABLE_NAME);
-//    }
-
-    private Cursor getMovie(Uri uri, String[] projection, String sortOrder) {
-        return null;
-    }
-
-
     private static UriMatcher buildUriMatcher() {
-        final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+        final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = MovieContract.CONTENT_AUTHORITY;
 
-        uriMatcher.addURI(authority, MovieContract.PATH_MOVIE, MOVIES);
-        uriMatcher.addURI(authority, MovieContract.PATH_MOVIE + "/#", MOVIE);
-        uriMatcher.addURI(authority, MovieContract.PATH_MOVIE + "/#/" + MovieContract.PATH_VIDEOS, MOVIE_VIDEOS);
-        uriMatcher.addURI(authority, MovieContract.PATH_MOVIE + "/#/" + MovieContract.PATH_REVIEWS, MOVIE_REVIEWS);
-        uriMatcher.addURI(authority, MovieContract.PATH_VIDEOS, VIDEOS);
-        uriMatcher.addURI(authority, MovieContract.PATH_REVIEWS, REVIEWS);
+        matcher.addURI(authority, MovieContract.PATH_MOVIES, MOVIES);
+        matcher.addURI(authority, MovieContract.PATH_MOVIES + "/#", MOVIE);
+        matcher.addURI(authority, MovieContract.PATH_MOVIES + "/#/" + MovieContract.PATH_VIDEOS,
+                MOVIE_VIDEOS);
+        matcher.addURI(authority, MovieContract.PATH_MOVIES + "/#/" + MovieContract.PATH_REVIEWS,
+                MOVIE_REVIEWS);
+        matcher.addURI(authority, MovieContract.PATH_VIDEOS, VIDEOS);
+        matcher.addURI(authority, MovieContract.PATH_REVIEWS, REVIEWS);
 
-        return uriMatcher;
+        return matcher;
     }
 
     @Override
@@ -66,7 +57,7 @@ public class MovieProvider extends ContentProvider {
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         Cursor retCursor;
         switch (sUriMatcher.match(uri)) {
-            case MOVIES:
+            case MOVIES: {
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         MovieContract.MovieEntry.TABLE_NAME,
                         projection,
@@ -77,7 +68,8 @@ public class MovieProvider extends ContentProvider {
                         sortOrder
                 );
                 break;
-            case MOVIE:
+            }
+            case MOVIE: {
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         MovieContract.MovieEntry.TABLE_NAME,
                         projection,
@@ -88,7 +80,8 @@ public class MovieProvider extends ContentProvider {
                         null
                 );
                 break;
-            case MOVIE_VIDEOS:
+            }
+            case MOVIE_VIDEOS: {
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         MovieContract.VideoEntry.TABLE_NAME,
                         projection,
@@ -99,7 +92,8 @@ public class MovieProvider extends ContentProvider {
                         sortOrder
                 );
                 break;
-            case MOVIE_REVIEWS:
+            }
+            case MOVIE_REVIEWS: {
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         MovieContract.ReviewEntry.TABLE_NAME,
                         projection,
@@ -110,6 +104,7 @@ public class MovieProvider extends ContentProvider {
                         sortOrder
                 );
                 break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown URI: " + uri);
         }
@@ -172,46 +167,49 @@ public class MovieProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
         int rowsDeleted;
 
-        if (null == selection) selection = "1";
+        if (null == selection){
+            selection = "1";
+        }
 
         switch (match) {
-            case MOVIES:
+            case MOVIES: {
                 rowsDeleted = db.delete(MovieContract.MovieEntry.TABLE_NAME,
                         selection,
                         selectionArgs);
                 break;
-
-            case MOVIE:
+            }
+            case MOVIE: {
                 rowsDeleted = db.delete(MovieContract.MovieEntry.TABLE_NAME,
                         MOVIE_BY_ID_SELECTION,
                         new String[]{Long.toString(MovieContract.parseId(uri))});
                 break;
-
-            case MOVIE_VIDEOS:
+            }
+            case MOVIE_VIDEOS: {
                 rowsDeleted = db.delete(
                         MovieContract.VideoEntry.TABLE_NAME,
                         VIDEOS_BY_MOVIE_SELECTION,
                         new String[]{Long.toString(MovieContract.parseId(uri))});
                 break;
-
-            case MOVIE_REVIEWS:
+            }
+            case MOVIE_REVIEWS: {
                 rowsDeleted = db.delete(
                         MovieContract.ReviewEntry.TABLE_NAME,
                         REVIEWS_BY_MOVIE_SELECTION,
                         new String[]{Long.toString(MovieContract.parseId(uri))});
                 break;
-            case VIDEOS:
+            }
+            case VIDEOS: {
                 rowsDeleted = db.delete(MovieContract.VideoEntry.TABLE_NAME,
                         selection,
                         selectionArgs);
                 break;
-
-            case REVIEWS:
+            }
+            case REVIEWS: {
                 rowsDeleted = db.delete(MovieContract.ReviewEntry.TABLE_NAME,
                         selection,
                         selectionArgs);
                 break;
-
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -248,7 +246,7 @@ public class MovieProvider extends ContentProvider {
     }
 
     @Override
-    public int bulkInsert(Uri uri, ContentValues[] values) {
+    public int bulkInsert(Uri uri, @NonNull ContentValues[] values) {
         String tableName;
         switch (sUriMatcher.match(uri)) {
             case MOVIES:
@@ -256,7 +254,7 @@ public class MovieProvider extends ContentProvider {
                 break;
 
             case VIDEOS:
-                tableName = MovieContract.MovieEntry.TABLE_NAME;
+                tableName = MovieContract.VideoEntry.TABLE_NAME;
                 break;
 
             case REVIEWS:
@@ -283,7 +281,5 @@ public class MovieProvider extends ContentProvider {
         }
         getContext().getContentResolver().notifyChange(uri, null);
         return returnCount;
-
-
     }
 }
